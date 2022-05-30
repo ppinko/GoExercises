@@ -56,7 +56,7 @@ func Build(records []Record) (*Node, error) {
 	}
 
 	// sort records by ID
-	sort.Slice(records, func(i, j int) bool { return records[i].ID < records[j].ID })
+	sort.(records, func(i, j int) bool { return records[i].ID < records[j].ID })
 
 	// verify no duplicates and continous ID's
 	for i := 0; i < len(records)-1; i++ {
