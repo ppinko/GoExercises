@@ -235,7 +235,7 @@ func (b *Buckets) Next(goalAmount int, startingBucket string, sols map[Buckets]b
 }
 
 func Solve(sizeBucketOne, sizeBucketTwo, goalAmount int, startBucket string) (string, int, int, error) {
-	if sizeBucketOne <= 0 || sizeBucketTwo <= 0 || goalAmount < 0 || (startBucket != "one" && startBucket != "two") {
+	if sizeBucketOne <= 0 || sizeBucketTwo <= 0 || goalAmount <= 0 || (startBucket != "one" && startBucket != "two") {
 		return "", 0, 0, errors.New("invalid input")
 	}
 
