@@ -73,7 +73,7 @@ func FormatLedger(currency string, locale string, entries []Entry) (string, erro
 		negative := false
 		cents := et.Change
 		if cents < 0 {
-			cents = cents * -1
+			cents = -cents
 			negative = true
 		}
 
@@ -109,9 +109,7 @@ func FormatLedger(currency string, locale string, entries []Entry) (string, erro
 			a += parts[i] + del1
 		}
 
-		a = a[:len(a)-1]
-		a += del2
-		a += centsStr[len(centsStr)-2:]
+		a = a[:len(a)-1] + del2 + centsStr[len(centsStr)-2:]
 		if negative {
 			a += neg
 		} else {
