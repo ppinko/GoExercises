@@ -81,83 +81,52 @@ func FormatLedger(currency string, locale string, entries []Entry) (string, erro
 			negative = true
 		}
 
-		var a string
+		centsStr := strconv.Itoa(cents)
+		switch len(centsStr) {
+		case 1:
+			centsStr = "00" + centsStr
+		case 2:
+			centsStr = "0" + centsStr
+		}
+		rest := centsStr[:len(centsStr)-2]
+
+		var parts []string
+		for len(rest) > 3 {
+			parts = append(parts, rest[len(rest)-3:])
+			rest = rest[:len(rest)-3]
+		}
+		if len(rest) > 0 {
+			parts = append(parts, rest)
+		}
+
+		beginning, end, del1, del2, neg := "", "", "", "", ""
 		if locale == "nl-NL" {
-			switch currency {
-			case "EUR":
-				{
-					a += "€ "
-				}
-			default:
-				{
-					a += "$ "
-				}
-			}
-			centsStr := strconv.Itoa(cents)
-			switch len(centsStr) {
-			case 1:
-				centsStr = "00" + centsStr
-			case 2:
-				centsStr = "0" + centsStr
-			}
-			rest := centsStr[:len(centsStr)-2]
-
-			var parts []string
-			for len(rest) > 3 {
-				parts = append(parts, rest[len(rest)-3:])
-				rest = rest[:len(rest)-3]
-			}
-			if len(rest) > 0 {
-				parts = append(parts, rest)
-			}
-			for i := len(parts) - 1; i >= 0; i-- {
-				a += parts[i] + "."
-			}
-			a = a[:len(a)-1]
-			a += ","
-			a += centsStr[len(centsStr)-2:]
-			if negative {
-				a += "-"
-			} else {
-				a += " "
-			}
+			end, del1, del2, neg = " ", ".", ",", "-"
 		} else {
-			if negative {
-				a += "("
-			}
-			if currency == "EUR" {
-				a += "€"
-			} else {
-				a += "$"
-			}
+			beginning, del1, del2, neg = "(", ",", ".", ")"
+		}
 
-			centsStr := strconv.Itoa(cents)
-			switch len(centsStr) {
-			case 1:
-				centsStr = "00" + centsStr
-			case 2:
-				centsStr = "0" + centsStr
-			}
-			rest := centsStr[:len(centsStr)-2]
-			var parts []string
-			for len(rest) > 3 {
-				parts = append(parts, rest[len(rest)-3:])
-				rest = rest[:len(rest)-3]
-			}
-			if len(rest) > 0 {
-				parts = append(parts, rest)
-			}
-			for i := len(parts) - 1; i >= 0; i-- {
-				a += parts[i] + ","
-			}
-			a = a[:len(a)-1]
-			a += "."
-			a += centsStr[len(centsStr)-2:]
-			if negative {
-				a += ")"
-			} else {
-				a += " "
-			}
+		var a string
+		if negative {
+			a += beginning
+		}
+		if currency == "EUR" {
+			a += "€" + end
+		} else {
+			a += "$" + end
+		}
+
+		for i := len(parts) - 1; i >= 0; i-- {
+			a += parts[i] + del1
+		}
+
+		a = a[:len(a)-1]
+		a += del2
+		a += centsStr[len(centsStr)-2:]
+		if negative {
+			a += neg
+		} else {
+			a += " "
 		}
 
 		al := utf8.RuneCountInString(a)
