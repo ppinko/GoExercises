@@ -20,10 +20,9 @@ func FormatLedger(currency string, locale string, entries []Entry) (string, erro
 	entriesCopy := make([]Entry, len(entries))
 	copy(entriesCopy, entries)
 
-	if len(entries) == 0 {
-		if _, err := FormatLedger(currency, "en-US", []Entry{{Date: "2014-01-01", Description: "", Change: 0}}); err != nil {
-			return "", err
-		}
+	if ((locale != "nl-NL") && (locale != "en-US")) ||
+		((currency != "USD") && (currency != "EUR")) {
+		return "", errors.New("invalid input")
 	}
 
 	m1 := map[bool]int{true: 0, false: 1}
@@ -55,10 +54,6 @@ func FormatLedger(currency string, locale string, entries []Entry) (string, erro
 			w1 = "Date"
 			w2 = "Description"
 			w3 = " | Change\n"
-		}
-	default:
-		{
-			return "", errors.New("")
 		}
 	}
 	s := w1 + strings.Repeat(" ", 10-len(w1)) + " | " + w2 + strings.Repeat(" ", 25-len(w2)) + w3
@@ -108,16 +103,11 @@ func FormatLedger(currency string, locale string, entries []Entry) (string, erro
 					{
 						a += "€ "
 					}
-				case "USD":
+				default:
 					{
 						a += "$ "
 					}
-				default:
-					{
-						co <- intermediate{e: errors.New("")}
-					}
 				}
-
 				centsStr := strconv.Itoa(cents)
 				switch len(centsStr) {
 				case 1:
@@ -146,17 +136,16 @@ func FormatLedger(currency string, locale string, entries []Entry) (string, erro
 				} else {
 					a += " "
 				}
-			} else if locale == "en-US" {
+			} else {
 				if negative {
 					a += "("
 				}
 				if currency == "EUR" {
 					a += "€"
-				} else if currency == "USD" {
-					a += "$"
 				} else {
-					co <- intermediate{e: errors.New("")}
+					a += "$"
 				}
+
 				centsStr := strconv.Itoa(cents)
 				switch len(centsStr) {
 				case 1:
@@ -184,8 +173,6 @@ func FormatLedger(currency string, locale string, entries []Entry) (string, erro
 				} else {
 					a += " "
 				}
-			} else {
-				co <- intermediate{e: errors.New("")}
 			}
 
 			al := utf8.RuneCountInString(a)
