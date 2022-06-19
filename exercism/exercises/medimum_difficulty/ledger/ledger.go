@@ -35,30 +35,26 @@ func FormatLedger(currency string, locale string, entries []Entry) (string, erro
 	})
 
 	var w1, w2, w3 string
+	beginning, end, del1, del2, neg := "", "", "", "", ""
 	switch locale {
 	case "nl-NL":
 		{
-			w1 = "Datum"
-			w2 = "Omschrijving"
-			w3 = " | Verandering\n"
+			w1, w2, w3 = "Datum", "Omschrijving", " | Verandering\n"
+			end, del1, del2, neg = " ", ".", ",", "-"
 		}
 	case "en-US":
 		{
-			w1 = "Date"
-			w2 = "Description"
-			w3 = " | Change\n"
+			w1, w2, w3 = "Date", "Description", " | Change\n"
+			beginning, del1, del2, neg = "(", ",", ".", ")"
 		}
 	}
 	s := w1 + strings.Repeat(" ", 10-len(w1)) + " | " + w2 + strings.Repeat(" ", 25-len(w2)) + w3
 
 	for _, et := range entriesCopy {
-		if len(et.Date) != 10 {
+		if (len(et.Date) != 10) || (et.Date[4] != '-') || (et.Date[7] != '-') {
 			return "", errors.New("invalid input")
 		}
-		d1, d2, d3, d4, d5 := et.Date[0:4], et.Date[4], et.Date[5:7], et.Date[7], et.Date[8:]
-		if (d2 != '-') || (d4 != '-') {
-			return "", errors.New("invalid input")
-		}
+		d1, d3, d5 := et.Date[0:4], et.Date[5:7], et.Date[8:]
 
 		de := et.Description
 		if len(de) > 25 {
@@ -97,13 +93,6 @@ func FormatLedger(currency string, locale string, entries []Entry) (string, erro
 		}
 		if len(rest) > 0 {
 			parts = append(parts, rest)
-		}
-
-		beginning, end, del1, del2, neg := "", "", "", "", ""
-		if locale == "nl-NL" {
-			end, del1, del2, neg = " ", ".", ",", "-"
-		} else {
-			beginning, del1, del2, neg = "(", ",", ".", ")"
 		}
 
 		var a string
